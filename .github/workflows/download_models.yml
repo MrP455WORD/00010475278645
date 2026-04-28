@@ -1,0 +1,42 @@
+name: Download Face Models
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download IP-Adapter Plus models
+        run: |
+          mkdir -p models/ipadapter models/clip_vision
+          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors
+          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sdxl_vit-h.safetensors
+          wget -P models/clip_vision https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors -O models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors
+
+      - name: Download InstantID models
+        run: |
+          mkdir -p models/instantid models/controlnet
+          wget -P models/instantid https://hf-mirror.com/InstantX/InstantID/resolve/main/ip-adapter.bin
+          wget -P models/controlnet https://hf-mirror.com/InstantX/InstantID/resolve/main/ControlNetModel/diffusion_pytorch_model.safetensors -O models/controlnet/instantid_controlnet.safetensors
+
+      - name: Download PuLID-Flux models
+        run: |
+          mkdir -p models/pulid
+          wget -P models/pulid https://hf-mirror.com/guozinan/PuLID/resolve/main/pulid_flux_v0.9.0.safetensors
+          # EVA-CLIP for PuLID
+          wget -P models/clip https://hf-mirror.com/QuanSun/EVA-CLIP/resolve/main/EVA02_CLIP_L_336_psz14_s6B.pt
+
+      - name: Download InsightFace antelopev2 (from GitHub Releases)
+        run: |
+          wget https://github.com/deepinsight/insightface/releases/download/v0.7/antelopev2.zip
+          unzip antelopev2.zip -d models/insightface/
+
+      - name: Package everything
+        run: zip -r comfy_face_models.zip models/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-models-bundle
+          path: comfy_face_models.zip
