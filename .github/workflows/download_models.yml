@@ -1,4 +1,4 @@
-name: Download Face Models Robust
+name: Download Face Models (Fixed)
 
 on:
   workflow_dispatch:
@@ -7,40 +7,53 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Download IP-Adapter Plus models
+      - name: Create directories
         run: |
-          mkdir -p models/ipadapter models/clip_vision
-          echo "Downloading ip-adapter-plus-face_sd15..."
-          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors || wget -P models/ipadapter https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors
-          
-          echo "Downloading ip-adapter-plus-face_sdxl..."
-          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sdxl_vit-h.safetensors || wget -P models/ipadapter https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sdxl_vit-h.safetensors
-          
-          echo "Downloading CLIP vision model..."
-          wget -O models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors || wget -O models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors
+          mkdir -p models/ipadapter models/clip_vision models/instantid models/controlnet models/pulid models/clip models/insightface
+
+      - name: Download IP-Adapter Plus (SD1.5 Face)
+        run: |
+          echo "Trying to download SD1.5 Face model..."
+          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors || \
+          wget -P models/ipadapter https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors
+
+      - name: Download IP-Adapter Plus (SDXL Face - مسیر اصلاح‌شده)
+        run: |
+          echo "Trying to download SDXL Face model..."
+          # مسیر اصلی Hugging Face: 'sdxl_models' نه 'models'
+          wget -P models/ipadapter https://hf-mirror.com/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors || \
+          wget -P models/ipadapter https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors
+
+      - name: Download CLIP Vision model
+        run: |
+          echo "Trying to download CLIP Vision model..."
+          wget -O models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors https://hf-mirror.com/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors || \
+          wget -O models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors
 
       - name: Download InstantID models
         run: |
-          mkdir -p models/instantid models/controlnet
-          echo "Downloading ip-adapter.bin..."
-          wget -P models/instantid https://hf-mirror.com/InstantX/InstantID/resolve/main/ip-adapter.bin || wget -P models/instantid https://huggingface.co/InstantX/InstantID/resolve/main/ip-adapter.bin
+          echo "Trying to download InstantID models..."
+          wget -P models/instantid https://hf-mirror.com/InstantX/InstantID/resolve/main/ip-adapter.bin || \
+          wget -P models/instantid https://huggingface.co/InstantX/InstantID/resolve/main/ip-adapter.bin
           
           echo "Downloading ControlNet..."
-          wget -O models/controlnet/instantid_controlnet.safetensors https://hf-mirror.com/InstantX/InstantID/resolve/main/ControlNetModel/diffusion_pytorch_model.safetensors || wget -O models/controlnet/instantid_controlnet.safetensors https://huggingface.co/InstantX/InstantID/resolve/main/ControlNetModel/diffusion_pytorch_model.safetensors
+          wget -O models/controlnet/instantid_controlnet.safetensors https://hf-mirror.com/InstantX/InstantID/resolve/main/ControlNetModel/diffusion_pytorch_model.safetensors || \
+          wget -O models/controlnet/instantid_controlnet.safetensors https://huggingface.co/InstantX/InstantID/resolve/main/ControlNetModel/diffusion_pytorch_model.safetensors
 
       - name: Download PuLID-Flux models
         run: |
-          mkdir -p models/pulid models/clip
-          echo "Downloading PuLID model..."
-          wget -P models/pulid https://hf-mirror.com/guozinan/PuLID/resolve/main/pulid_flux_v0.9.0.safetensors || wget -P models/pulid https://huggingface.co/guozinan/PuLID/resolve/main/pulid_flux_v0.9.0.safetensors
+          echo "Trying to download PuLID-Flux models..."
+          wget -P models/pulid https://hf-mirror.com/guozinan/PuLID/resolve/main/pulid_flux_v0.9.0.safetensors || \
+          wget -P models/pulid https://huggingface.co/guozinan/PuLID/resolve/main/pulid_flux_v0.9.0.safetensors
           
           echo "Downloading EVA-CLIP..."
-          wget -P models/clip https://hf-mirror.com/QuanSun/EVA-CLIP/resolve/main/EVA02_CLIP_L_336_psz14_s6B.pt || wget -P models/clip https://huggingface.co/QuanSun/EVA-CLIP/resolve/main/EVA02_CLIP_L_336_psz14_s6B.pt
+          wget -P models/clip https://hf-mirror.com/QuanSun/EVA-CLIP/resolve/main/EVA02_CLIP_L_336_psz14_s6B.pt || \
+          wget -P models/clip https://huggingface.co/QuanSun/EVA-CLIP/resolve/main/EVA02_CLIP_L_336_psz14_s6B.pt
 
       - name: Download InsightFace antelopev2 (from GitHub Releases)
         run: |
-          mkdir -p models/insightface
-          wget https://github.com/deepinsight/insightface/releases/download/v0.7/antelopev2.zip -O antelopev2.zip || wget https://github.com/czczup/insightface/releases/download/v0.7/antelopev2.zip -O antelopev2.zip
+          wget https://github.com/deepinsight/insightface/releases/download/v0.7/antelopev2.zip -O antelopev2.zip || \
+          wget https://github.com/czczup/insightface/releases/download/v0.7/antelopev2.zip -O antelopev2.zip
           unzip antelopev2.zip -d models/insightface/
 
       - name: Verify all downloads
@@ -54,7 +67,7 @@ jobs:
             "models/controlnet/instantid_controlnet.safetensors"
             "models/pulid/pulid_flux_v0.9.0.safetensors"
             "models/clip/EVA02_CLIP_L_336_psz14_s6B.pt"
-            "models/insightface/antelopev2/1k3d68.onnx"  # just one indicative file
+            "models/insightface/antelopev2/1k3d68.onnx"
           )
           for file in "${REQUIRED_FILES[@]}"; do
             if [ ! -f "$file" ]; then
@@ -65,8 +78,10 @@ jobs:
             fi
           done
 
-      - name: Package everything
-        run: zip -r comfy_face_models.zip models/
+      - name: Package everything (without antelopev2.zip)
+        run: |
+          rm -f antelopev2.zip
+          zip -r comfy_face_models.zip models/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
